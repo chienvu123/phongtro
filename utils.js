@@ -113,6 +113,8 @@ export async function fillSoDienNuoc() {
     for (let j = 0; j <= sheetData.rowCount; j++) {
       const rowData = sheetData.getRow(j);
       const maKHFromData = rowData.getCell(5).value;
+
+
       if (maKH === maKHFromData) {
         const dienDau = row.getCell(cellDau).value;
         const dienCuoi = row.getCell(cellCuoi).value;

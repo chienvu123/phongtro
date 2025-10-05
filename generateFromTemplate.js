@@ -3,17 +3,17 @@ import path from 'path';
 import ExcelJS from 'exceljs';
 import PizZip from 'pizzip';
 import Docxtemplater from "docxtemplater"
-import { convertDataFromRow, reset,fillSoDienNuoc } from './utils.js'
+import { convertDataFromRow, reset, fillSoDienNuoc } from './utils.js'
 
 
 // === HÀM CHÍNH === //
 async function generateFromTemplate() {
-  
+
   reset()
-fillSoDienNuoc()
+  fillSoDienNuoc()
   // Đọc template Word
   const content = fs.readFileSync(
-    path.resolve( './template.docx'),
+    path.resolve('./template.docx'),
     'binary',
   );
   //   console.log(content)
@@ -31,24 +31,25 @@ fillSoDienNuoc()
     if (!maKH) continue;
     if (existMaKH[maKH]) continue;
     existMaKH[maKH] = true;
+    if (maKH.includes('WC')) break;
 
-   
-    
     const data = convertDataFromRow(maKH, row);
 
     try {
- 
-       // Chuẩn bị template docx
-    const zip = new PizZip(content);
-    const doc = new Docxtemplater(zip, {
-      paragraphLoop: true,
-      linebreaks: true,
-    });
+
+      // Chuẩn bị template docx
+      const zip = new PizZip(content);
+      const doc = new Docxtemplater(zip, {
+        paragraphLoop: true,
+        linebreaks: true,
+      });
+
+
       doc.render(data);
 
-      const buf = doc.getZip().generate({type: 'nodebuffer'});
+      const buf = doc.getZip().generate({ type: 'nodebuffer' });
 
-      const outPath = path.resolve( './output', `${maKH}.docx`);
+      const outPath = path.resolve('./output', `${maKH}.docx`);
       fs.writeFileSync(outPath, buf);
       //   console.log(`✅ Tạo file: ${maKH}`);
     } catch (error) {
