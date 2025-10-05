@@ -126,24 +126,30 @@ export async function fillSoDienNuoc() {
           rowData.getCell(cellDataDienCuoi).value = dienCuoi;
         }
 
+        // tính số điện nhà WC của từng tầng
         if (maKH.includes('WC')) {
           const soTang = maKH[maKH.length - 1];
           const listPhongUseWc = [];
           let e = j
+
+          // tìm các phòng dùng chung WC này
           while (1) {
             --e;
             let rowPhongUseWc = sheetData.getRow(e);
             const soPhong = rowPhongUseWc.getCell(4).value;
             if (!soPhong || !soPhong.toString().startsWith(soTang)) break;
 
-            listPhongUseWc.push(rowPhongUseWc);
+            // phòng nào có người thì mới tính
+            if (rowPhongUseWc.getCell(14).value > 0) listPhongUseWc.push(rowPhongUseWc);
 
             if (e < 3) break;
           }
-          const tongSoNguoi = listPhongUseWc.reduce((total, _row) => total + (_row.getCell(14).value || 0), 0);
+
+          const tongSoNguoi = listPhongUseWc.reduce((total, _row) => total + (_row.getCell(14).value), 0);
           const tongTienDien = (dienCuoi - dienDau) * rowData.getCell(9);
-          if (!tongSoNguoi) break;
           const tienDienMoiNguoi = tongTienDien / tongSoNguoi;
+
+          // ghi lại vào các cell
           listPhongUseWc.forEach(_row => {
             const songuoi = _row.getCell(14).value;
             _row.getCell(22).value = Math.ceil(tienDienMoiNguoi * songuoi);
